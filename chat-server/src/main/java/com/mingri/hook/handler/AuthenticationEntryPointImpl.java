@@ -1,4 +1,4 @@
-package com.mingri.handler;
+package com.mingri.hook.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.mingri.constant.MessageConstant;

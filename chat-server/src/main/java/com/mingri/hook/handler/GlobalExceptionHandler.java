@@ -1,4 +1,4 @@
-package com.mingri.handler;
+package com.mingri.hook.handler;
 
 import com.mingri.exception.BaseException;
 import com.mingri.result.Result;

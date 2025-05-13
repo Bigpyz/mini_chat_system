@@ -62,7 +62,7 @@ public class SysUser implements Serializable {
 
     @ApiModelProperty(value = "创建人的用户id")
     @TableField(value = "create_By",fill = FieldFill.INSERT)
-    private Long createBy;
+    private String createBy;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(value = "create_time",fill = FieldFill.INSERT)
@@ -70,7 +70,7 @@ public class SysUser implements Serializable {
 
     @ApiModelProperty(value = "更新人")
     @TableField(value = "update_By",fill = FieldFill.UPDATE)
-    private Long updateBy;
+    private String updateBy;
 
     @ApiModelProperty(value = "更新时间")
     @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
