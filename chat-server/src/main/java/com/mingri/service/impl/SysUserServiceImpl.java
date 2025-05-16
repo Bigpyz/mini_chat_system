@@ -118,7 +118,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      **/
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.debug("到这了333333");
         //根据用户名查询数据库中的数据
         SysUser sysUser = lambdaQuery().eq(SysUser::getUserName, username).one();
         if(Objects.isNull(sysUser)){
@@ -132,7 +131,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //权限集合，在LoginUser类做权限集合的转换
 //        List<String> list = new ArrayList<>(Arrays.asList("test","admin","user"));
         List<String> list = sysMenuMapper.selectPermsByUserId(sysUser.getId());
-
+        log.info("权限集合：{}",list);
         //把查询到的user结果，封装成UserDetails类型返回
         return new LoginUser(sysUser,list); //这里传了第二个参数，表示的是权限信息
     }

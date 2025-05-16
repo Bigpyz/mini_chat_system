@@ -1,4 +1,4 @@
-package com.mingri.entity;
+package com.mingri.dto.page;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import javax.validation.constraints.Min;
 
 @Data

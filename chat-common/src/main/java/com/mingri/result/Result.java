@@ -1,5 +1,6 @@
 package com.mingri.result;
 
+import cn.hutool.json.JSONObject;
 import lombok.Data;
 import java.io.Serializable;
 
@@ -10,6 +11,17 @@ public class Result<T> implements Serializable {
     private Integer code; //编码：1成功，0和其它数字为失败
     private String msg; //错误信息
     private T data; //数据
+
+    /**
+     * 根据条件返回
+     */
+    public static Object ResultByFlag(boolean flag) {
+        if (flag) {
+            return success();
+        } else {
+            return error();
+        }
+    }
 
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();

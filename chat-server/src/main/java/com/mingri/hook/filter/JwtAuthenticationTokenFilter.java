@@ -74,7 +74,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 userId = claims.get(JwtClaimsConstant.USER_ID).toString();
                 log.info("当前用户的id：{}", userId);
                 // 验证是否在其他地方登录
-                String cacheToken = cacheUtil.getUserSessionCache(userId.toString());
+                String cacheToken = cacheUtil.getUserSessionCache(userId);
                 if (StrUtil.isBlank(cacheToken)){
                     throw new UserNotLoginException(MessageConstant.AUTHENTICATION_FAILED);
                 }

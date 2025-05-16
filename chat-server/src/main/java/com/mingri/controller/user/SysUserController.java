@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +42,6 @@ public class SysUserController {
 
     /**
      * 登录
-     * @param userLoginDTO
-     * @return
      */
     @UrlLimit(keyType = LimitKeyType.IP)
     @ApiOperation("用户登录")
@@ -75,9 +74,7 @@ public class SysUserController {
 
 
     /**
-     * @Description: 用户注册
-     * @Author: mingri31164
-     * @Date: 2025/1/20 18:13
+     * 用户注册
      **/
     @UrlLimit(keyType = LimitKeyType.IP)
     @PostMapping("/register")
@@ -119,6 +116,7 @@ public class SysUserController {
 
     @UrlLimit
     @ApiOperation("查询所有用户信息")
+    @PreAuthorize("hasAuthority('sys:user:list')")
     @GetMapping("/list/map")
     public Object listMapUser() {
         Map<String, SysUserInfoVO> result = iSysUserService.listMapUser();
