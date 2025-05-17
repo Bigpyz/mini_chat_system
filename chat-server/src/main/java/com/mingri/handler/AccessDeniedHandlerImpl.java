@@ -1,9 +1,10 @@
-package com.mingri.hook.handler;
+package com.mingri.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.mingri.constant.MessageConstant;
 import com.mingri.result.Result;
 import com.mingri.utils.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * @Version: 1.0
  */
 
+@Slf4j
 @Component
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
@@ -30,6 +32,10 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
      **/
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        log.error("AccessDeniedHandler 拦截到权限异常：{}",
+                accessDeniedException.getMessage(), accessDeniedException);
+
+
         Result<Object> error = Result.error
                 (HttpStatus.FORBIDDEN.value(), MessageConstant.PERMISSION_NOT_EXIST);
         String json = JSON.toJSONString(error);

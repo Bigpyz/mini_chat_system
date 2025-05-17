@@ -24,7 +24,7 @@ public class SysUserInfoVO implements Serializable {
 
     @ApiModelProperty("用户名")
     @TableField(value = "user_name")
-    private String userName;
+    private String name;
 
     @ApiModelProperty("头像")
     private String avatar;

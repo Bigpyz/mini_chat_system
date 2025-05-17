@@ -86,6 +86,7 @@ public class SysUserController {
     }
 
 
+
     /**
      * 退出
      * @return
@@ -116,7 +117,6 @@ public class SysUserController {
 
     @UrlLimit
     @ApiOperation("查询所有用户信息")
-    @PreAuthorize("hasAuthority('sys:user:list')")
     @GetMapping("/list/map")
     public Object listMapUser() {
         Map<String, SysUserInfoVO> result = iSysUserService.listMapUser();

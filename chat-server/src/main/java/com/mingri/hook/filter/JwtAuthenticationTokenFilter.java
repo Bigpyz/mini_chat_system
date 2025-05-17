@@ -7,7 +7,7 @@ import com.mingri.constant.JwtClaimsConstant;
 import com.mingri.constant.MessageConstant;
 import com.mingri.constant.RedisConstant;
 import com.mingri.context.BaseContext;
-import com.mingri.entity.LoginUser;
+import com.mingri.entity.login.LoginUser;
 import com.mingri.exception.LoginFailedException;
 import com.mingri.exception.UserNotLoginException;
 import com.mingri.properties.JwtProperties;
@@ -75,16 +75,20 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 log.info("当前用户的id：{}", userId);
                 // 验证是否在其他地方登录
                 String cacheToken = cacheUtil.getUserSessionCache(userId);
+                System.out.println("缓存的token："+cacheToken);
+                System.out.println("登录的token："+token);
                 if (StrUtil.isBlank(cacheToken)){
                     throw new UserNotLoginException(MessageConstant.AUTHENTICATION_FAILED);
                 }
                 else if (!cacheToken.equals(token)){
+                    System.out.println("到这了111111");
                     Result<Object> error = Result.error
                             (HttpStatus.FORBIDDEN.value(), MessageConstant.LOGIN_IN_OTHER_PLACE);
                     String json = JSON.toJSONString(error);
                     WebUtils.renderString(response,json);
                     return;
                 }
+                System.out.println("到这了222");
                 setUserInfo(claims, url, request, response);
             } catch (Exception e) {
                 throw new LoginFailedException(MessageConstant.TOKEN_ERROR);

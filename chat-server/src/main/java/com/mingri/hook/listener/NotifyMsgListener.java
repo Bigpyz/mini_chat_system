@@ -24,7 +24,7 @@ public class NotifyMsgListener<T> implements ApplicationListener<NotifyMsgEvent<
     private WebSocketService webSocketService;
 
 
-//    @Async("notify")
+    @Async
     @SuppressWarnings("unchecked")
     @Override
     public void onApplicationEvent(NotifyMsgEvent<T> msgEvent) {

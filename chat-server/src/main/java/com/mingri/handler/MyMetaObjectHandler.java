@@ -1,4 +1,4 @@
-package com.mingri.hook.handler;
+package com.mingri.handler;
 
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;

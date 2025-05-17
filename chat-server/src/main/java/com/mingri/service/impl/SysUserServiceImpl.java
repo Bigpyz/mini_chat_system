@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mingri.constant.*;
 import com.mingri.constant.type.BadgeType;
@@ -14,7 +13,7 @@ import com.mingri.dto.message.NotifyDto;
 import com.mingri.dto.user.SysUpdateDTO;
 import com.mingri.dto.user.SysUserLoginDTO;
 import com.mingri.dto.user.SysUserRegisterDTO;
-import com.mingri.entity.LoginUser;
+import com.mingri.entity.login.LoginUser;
 import com.mingri.entity.SysUser;
 import com.mingri.enumeration.UserStatus;
 import com.mingri.enumeration.UserTypes;
@@ -22,7 +21,6 @@ import com.mingri.exception.BaseException;
 import com.mingri.exception.EmailErrorException;
 import com.mingri.exception.LoginFailedException;
 import com.mingri.exception.RegisterFailedException;
-import com.mingri.mapper.SysMenuMapper;
 import com.mingri.mapper.SysUserMapper;
 import com.mingri.service.IChatListService;
 import com.mingri.service.ISysUserService;
@@ -59,8 +57,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private SysMenuMapper sysMenuMapper;
     @Autowired
     private WebSocketService webSocketService;
     @Autowired
@@ -129,8 +125,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         // 查询用户权限信息
         //权限集合，在LoginUser类做权限集合的转换
-//        List<String> list = new ArrayList<>(Arrays.asList("test","admin","user"));
-        List<String> list = sysMenuMapper.selectPermsByUserId(sysUser.getId());
+        List<String> list = new ArrayList<>(Arrays.asList("test","admin","user"));
+//        List<String> list = sysMenuMapper.selectPermsByUserId(sysUser.getId());
         log.info("权限集合：{}",list);
         //把查询到的user结果，封装成UserDetails类型返回
         return new LoginUser(sysUser,list); //这里传了第二个参数，表示的是权限信息
