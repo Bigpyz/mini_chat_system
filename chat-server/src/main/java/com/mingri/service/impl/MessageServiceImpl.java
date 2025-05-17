@@ -16,9 +16,7 @@ import com.mingri.dto.message.RecordDTO;
 import com.mingri.dto.message.SendMessageDTO;
 import com.mingri.dto.message.TextMessageContent;
 import com.mingri.entity.Message;
-import com.mingri.enumeration.NotifyTypeEnum;
 import com.mingri.enumeration.UserTypes;
-import com.mingri.event.NotifyMsgEvent;
 import com.mingri.exception.BaseException;
 import com.mingri.mapper.MessageMapper;
 import com.mingri.service.*;
@@ -61,14 +59,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Override
     public Message send(SendMessageDTO sendMessageDTO) {
         if (MessageSource.Group.equals(sendMessageDTO.getSource())) {
-            return sendMessageToGroup(BaseContext.getCurrentId().toString(),sendMessageDTO);
+            return sendMessageToGroup(BaseContext.getCurrentId(),sendMessageDTO);
         } else {
             return sendMessageToUser(sendMessageDTO);
         }
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public List<Message> record(RecordDTO recordDTO) {
         String userId = BaseContext.getCurrentId();
         List<Message> messages = messageMapper.record(userId, recordDTO.getTargetId(),
@@ -116,10 +114,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public Message sendMessageToGroup(String userId, SendMessageDTO sendMessageDTO) {
-        Message message = sendMessage(userId, sendMessageDTO , MessageSource.Group);
-        NotifyMsgEvent<Message> sendMessageToGroupEvent =
-                new NotifyMsgEvent<>(this, NotifyTypeEnum.GROUP_CHAT, message);
-        eventPublisher.publishEvent(sendMessageToGroupEvent);
+        Message message = sendMessage(userId, sendMessageDTO, MessageSource.Group);
+        //更新群聊列表
+        chatListService.updateChatListGroup(message);
+        webSocketService.sendMsgToGroup(message);
         return message;
     }
 

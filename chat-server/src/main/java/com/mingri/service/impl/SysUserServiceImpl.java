@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mingri.constant.*;
 import com.mingri.constant.type.BadgeType;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -63,7 +65,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private CacheUtil cacheUtil;
     @Autowired
     private IChatListService chatListService;
-
 
     public void register(SysUserRegisterDTO sysUserRegisterDTO) {
 
@@ -202,13 +203,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public SysUserInfoVO getUserById(String userId) {
         return baseMapper.getUserById(userId);
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public List<SysUserInfoVO> listUser() {
         return baseMapper.listUser();
     }
@@ -219,7 +220,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public Map<String, SysUserInfoVO> listMapUser() {
         return baseMapper.listMapUser();
     }
@@ -307,7 +308,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public boolean updateUser(SysUpdateDTO sysUpdateDTO) {
+    public void updateUser(SysUpdateDTO sysUpdateDTO) {
         SysUser user = lambdaQuery().eq(SysUser::getUserName, sysUpdateDTO.getName()).one();
         if (user != null) {
             if (!user.getId().equals(BaseContext.getCurrentId()))
@@ -317,7 +318,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         user.setUserName(sysUpdateDTO.getName());
         user.setAvatar(sysUpdateDTO.getAvatar());
-        return updateById(user);
     }
 
 

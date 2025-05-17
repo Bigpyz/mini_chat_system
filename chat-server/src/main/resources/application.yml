@@ -22,29 +22,19 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           hikari:
             max-lifetime: 70000
-#        slave:
-#          url: jdbc:mysql://${mingri.datasource.slave.host}:${mingri.datasource.slave.port}/${mingri.datasource.slave.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-#          username: ${mingri.datasource.slave.username}
-#          password: ${mingri.datasource.slave.password}
-#          driver-class-name: com.mysql.cj.jdbc.Driver
-#          hikari:
-#            max-lifetime: 70000
+        slave:
+          url: jdbc:mysql://${mingri.datasource.slave.host}:${mingri.datasource.slave.port}/${mingri.datasource.slave.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+          username: ${mingri.datasource.slave.username}
+          password: ${mingri.datasource.slave.password}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          hikari:
+            max-lifetime: 70000
 
   redis:
     host: ${mingri.redis.host}
     port: ${mingri.redis.port}
     password: ${mingri.redis.password}
     database: ${mingri.redis.database}
-    pool-size: 10
-    min-idle-size: 5
-    idle-timeout: 30000
-    connect-timeout: 5000
-    retry-attempts: 3
-    retry-interval: 1000
-    ping-interval: 60000
-    keep-alive: true
-
-
 
 #mybatis:
 #  #mapper配置文件

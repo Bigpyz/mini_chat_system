@@ -53,5 +53,5 @@ public interface ISysUserService extends IService<SysUser> {
 
     void initBotUser();
 
-    boolean updateUser(SysUpdateDTO sysUpdateDTO);
+    void updateUser(SysUpdateDTO sysUpdateDTO);
 }
