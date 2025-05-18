@@ -2,6 +2,7 @@ package com.mingri.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
@@ -30,7 +31,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
     private ISysUserService sysUserService;
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public List<ChatList> privateList() {
         String currentId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();
@@ -40,7 +41,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public ChatList getGroup() {
         String userId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();
@@ -56,7 +57,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
             ChatGroup group = Db.lambdaQuery(ChatGroup.class).eq(ChatGroup::getId, "1").one();
             SysUserInfoVO userDto = new SysUserInfoVO();
             userDto.setId(group.getId());
-            userDto.setUserName(group.getName());
+            userDto.setName(group.getName());
             userDto.setAvatar(group.getAvatar());
             chat.setTargetInfo(userDto);
             save(chat);
@@ -146,7 +147,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         }
     }
 
-    //@DS("slave")
+    @DS("slave")
     private ChatList getTargetChatList(String targetId) {
         String userId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();

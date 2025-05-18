@@ -1,11 +1,16 @@
 package com.mingri.service;
 
+import com.mingri.dto.admin.SysAddUserDTO;
+import com.mingri.dto.admin.SysUpdateUserDTO;
+import com.mingri.dto.page.PageQuery;
 import com.mingri.dto.user.SysUpdateDTO;
 import com.mingri.dto.user.SysUserLoginDTO;
 import com.mingri.dto.user.SysUserRegisterDTO;
 import com.mingri.entity.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mingri.result.PageResult;
 import com.mingri.vo.SysUserInfoVO;
+import com.mingri.vo.SysUserListVO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,24 +20,12 @@ import java.util.Map;
 public interface ISysUserService extends IService<SysUser> {
 
     /**
-     * 用户登录
-     *
-     * @param userLoginDTO
-     * @return
-     */
+     * 客户端
+     **/
     SysUser login(SysUserLoginDTO userLoginDTO);
 
-
-    /**
-     * 用户注册
-     *
-     * @param userRegisterDTO
-     */
     void register(SysUserRegisterDTO userRegisterDTO);
 
-    /**
-     * 用户退出
-     */
     void logout();
 
     SysUserInfoVO getUserById(String userId);
@@ -53,5 +46,19 @@ public interface ISysUserService extends IService<SysUser> {
 
     void initBotUser();
 
-    boolean updateUser(SysUpdateDTO sysUpdateDTO);
+    boolean updateSelf(SysUpdateDTO sysUpdateDTO);
+
+
+    /**
+     * 管理端
+     **/
+    PageResult<SysUserListVO> listUser(PageQuery pageQuery);
+
+    boolean addUser(SysAddUserDTO sysAddUserDTO);
+
+    boolean updateUser(SysUpdateUserDTO sysUpdateUserDTO);
+
+    boolean deleteUser(String userid);
+
+    SysUpdateUserDTO getUser(String userid);
 }

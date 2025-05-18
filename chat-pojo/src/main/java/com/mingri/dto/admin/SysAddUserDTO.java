@@ -1,13 +1,10 @@
-package com.mingri.dto.sys;
+package com.mingri.dto.admin;
 
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @ApiModel(value = "添加用户对象")

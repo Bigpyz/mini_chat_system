@@ -1,27 +1,22 @@
 mingri:
   datasource:
     master:
-      host: 127.0.0.1
-      port: 3306 #3339
-      database: chatroom
+      host:
+      port: 3339 #3339
+      database: mini-chat
       username: root
       password: 123456
     slave:
-      host: 127.0.0.1
+      host:
       port: 3340
       database: mini-chat
       username: root
       password: 123456
   redis:
-    host: 127.0.0.1
+    host:
     port: 6379
     password:
     database: 1
-  alioss:
-    endpoint: oss-cn-hangzhou.aliyuncs.com
-    access-key-id:
-    access-key-secret:
-    bucket-name:
   mail:
     from: 3116430062@qq.com
     password:

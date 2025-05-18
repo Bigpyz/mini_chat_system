@@ -6,11 +6,15 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mingri.constant.*;
 import com.mingri.constant.type.BadgeType;
 import com.mingri.constant.type.NotifyType;
 import com.mingri.context.BaseContext;
+import com.mingri.dto.admin.SysAddUserDTO;
+import com.mingri.dto.admin.SysUpdateUserDTO;
 import com.mingri.dto.message.NotifyDto;
+import com.mingri.dto.page.PageQuery;
 import com.mingri.dto.user.SysUpdateDTO;
 import com.mingri.dto.user.SysUserLoginDTO;
 import com.mingri.dto.user.SysUserRegisterDTO;
@@ -24,6 +28,7 @@ import com.mingri.exception.LoginFailedException;
 import com.mingri.exception.RegisterFailedException;
 import com.mingri.mapper.SysMenuMapper;
 import com.mingri.mapper.SysUserMapper;
+import com.mingri.result.PageResult;
 import com.mingri.service.IChatListService;
 import com.mingri.service.ISysUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,6 +36,7 @@ import com.mingri.service.WebSocketService;
 import com.mingri.utils.CacheUtil;
 import com.mingri.utils.RedisUtils;
 import com.mingri.vo.SysUserInfoVO;
+import com.mingri.vo.SysUserListVO;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
@@ -69,12 +75,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private IChatListService chatListService;
 
 
+    /**
+     * @Description: 客户端
+     * @Author: mingri31164
+     * @Date: 2025/5/18 15:06
+     **/
+
     public void register(SysUserRegisterDTO sysUserRegisterDTO) {
 
-        // TODO 邮箱重复处理
-//        if (lambdaQuery().eq(SysUser::getEmail, sysUserRegisterDTO.getEmail()).exists()) {
-//            throw new RegisterFailedException(MessageConstant.EMAIL_EXIST);
-//        }
         // 根据邮箱生成Redis键名
         String redisKey = MailConstant.CAPTCHA_CODE_KEY_PRE + sysUserRegisterDTO.getEmail();
         // 尝试从Redis获取现有的验证码
@@ -158,11 +166,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             if (sysUser.getStatus().equals(UserStatus.FREEZE)) {
                 throw new LoginFailedException(MessageConstant.ACCOUNT_LOCKED);
             }
-            // 验证是否在其他地方登录
-//            String cacheToken = cacheUtil.getUserSessionCache(sysUser.getId().toString());
-//            if (StrUtil.isNotBlank(cacheToken)){
-//                throw new LoginFailedException(MessageConstant.LOGIN_IN_OTHER_PLACE);
-//            }
 
             updateUserBadge(sysUser.getId());
 
@@ -206,13 +209,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public SysUserInfoVO getUserById(String userId) {
         return baseMapper.getUserById(userId);
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public List<SysUserInfoVO> listUser() {
         return baseMapper.listUser();
     }
@@ -223,7 +226,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    //@DS("slave")
+    @DS("slave")
     public Map<String, SysUserInfoVO> listMapUser() {
         return baseMapper.listMapUser();
     }
@@ -311,7 +314,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public boolean updateUser(SysUpdateDTO sysUpdateDTO) {
+    public boolean updateSelf(SysUpdateDTO sysUpdateDTO) {
         SysUser user = lambdaQuery().eq(SysUser::getUserName, sysUpdateDTO.getName()).one();
         if (user != null) {
             if (!user.getId().equals(BaseContext.getCurrentId()))
@@ -322,6 +325,69 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         user.setUserName(sysUpdateDTO.getName());
         user.setAvatar(sysUpdateDTO.getAvatar());
         return updateById(user);
+    }
+
+
+
+
+
+
+
+    /**
+     * @Description: 管理端
+     * @Author: mingri31164
+     * @Date: 2025/5/18 15:07
+     **/
+
+    @Override
+    public PageResult<SysUserListVO> listUser(PageQuery pageQuery) {
+        Page<SysUser> page = pageQuery.toMpPageDefaultSortByCreateTimeDesc();
+        Page<SysUser> p = lambdaQuery()
+                .ne(SysUser::getDelFlag, -1)
+                .page(page);
+        return PageResult.of(p, user -> {
+            SysUserListVO vo = com.mingri.utils.BeanUtils.copyProperties(user, SysUserListVO.class);
+            return vo;
+        });
+    }
+
+    @Override
+    public boolean addUser(SysAddUserDTO sysAddUserDTO) {
+        SysUser user = new SysUser();
+        com.mingri.utils.BeanUtils.copyProperties(sysAddUserDTO, user);
+        user.setId(IdUtil.simpleUUID());
+        user.setStatus(UserStatus.NORMAL);
+        user.setBadge(Collections.singletonList("clover"));
+        user.setPassword(passwordEncoder.encode(PasswordConstant.DEFAULT_PASSWORD));
+
+        return save(user);
+    }
+
+    @Override
+    public boolean updateUser(SysUpdateUserDTO sysUpdateUserDTO) {
+        SysUser sysUser = lambdaQuery().eq(SysUser::getUserName, sysUpdateUserDTO.getUserName()).one();
+        if (sysUser != null) {
+            throw new BaseException(MessageConstant.ACCOUNT_EXIST);
+        }
+        SysUser user = new SysUser();
+        com.mingri.utils.BeanUtils.copyProperties(sysUpdateUserDTO, user);
+        return updateById(user);
+    }
+
+    @Override
+    public boolean deleteUser(String userid) {
+        SysUser user = getById(userid);
+        user.setDelFlag(UserStatus.DELETE.getCode());
+        return updateById(user);
+    }
+
+    @Override
+    public SysUpdateUserDTO getUser(String userid) {
+        SysUser sysUser = getById(userid);
+        log.info("获取到该用户:{}", sysUser);
+        SysUpdateUserDTO sysUpdateUserDTO = new SysUpdateUserDTO();
+        com.mingri.utils.BeanUtils.copyProperties(sysUser, sysUpdateUserDTO);
+        return sysUpdateUserDTO;
     }
 
 

@@ -1,4 +1,4 @@
-package com.mingri.dto.sys;
+package com.mingri.dto.admin;
 
 
 import com.baomidou.mybatisplus.annotation.TableField;

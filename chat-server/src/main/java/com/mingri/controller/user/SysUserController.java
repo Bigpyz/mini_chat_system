@@ -100,7 +100,7 @@ public class SysUserController {
 
 
     /**
-     * 编辑用户信息
+     * 编辑用户个人信息
      * @param sysUpdateDTO
      * @return
      */
@@ -109,14 +109,13 @@ public class SysUserController {
     @ApiOperation("编辑用户信息")
     public Result update(@RequestBody SysUpdateDTO sysUpdateDTO){
         log.info("编辑用户信息：{}", sysUpdateDTO);
-        iSysUserService.updateUser(sysUpdateDTO);
+        iSysUserService.updateSelf(sysUpdateDTO);
         return Result.success();
     }
 
 
     @UrlLimit
     @ApiOperation("查询所有用户信息")
-    @PreAuthorize("hasAuthority('sys:user:list')")
     @GetMapping("/list/map")
     public Object listMapUser() {
         Map<String, SysUserInfoVO> result = iSysUserService.listMapUser();
