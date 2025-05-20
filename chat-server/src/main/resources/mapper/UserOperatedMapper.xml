@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mingri.mapper.UserOperatedMapper">
+
+    <!-- UserOperatedVO 映射 -->
+    <resultMap id="UserOperatedVOResultMap" type="com.mingri.vo.UserOperatedVO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="avatar" property="avatar"/>
+        <result column="user_name" property="name"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="email" property="email"/>
+        <result column="type" property="type"/>
+        <result column="address" property="address"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 查询今日登录详情 -->
+    <select id="loginDetails" resultMap="UserOperatedVOResultMap">
+        SELECT
+            o.id,
+            o.user_id,
+            u.avatar,
+            u.user_name,
+            u.nick_name,
+            u.email,
+            o.type,
+            o.address,
+            o.create_time
+        FROM
+            user_operated o
+                JOIN
+            sys_user u ON o.user_id = u.id
+        WHERE
+            o.type = 'login'
+          AND DATE(o.create_time) = CURDATE()
+    </select>
+
+</mapper>

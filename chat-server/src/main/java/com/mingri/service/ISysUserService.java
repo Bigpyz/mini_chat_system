@@ -19,9 +19,7 @@ import java.util.Map;
 
 public interface ISysUserService extends IService<SysUser> {
 
-    /**
-     * 客户端
-     **/
+    // 客户端
     SysUser login(SysUserLoginDTO userLoginDTO);
 
     void register(SysUserRegisterDTO userRegisterDTO);
@@ -49,9 +47,9 @@ public interface ISysUserService extends IService<SysUser> {
     boolean updateSelf(SysUpdateDTO sysUpdateDTO);
 
 
-    /**
-     * 管理端
-     **/
+
+
+    // 管理端
     PageResult<SysUserListVO> listUser(PageQuery pageQuery);
 
     boolean addUser(SysAddUserDTO sysAddUserDTO);
@@ -61,4 +59,8 @@ public interface ISysUserService extends IService<SysUser> {
     boolean deleteUser(String userid);
 
     SysUpdateUserDTO getUser(String userid);
+
+    SysUser validateLogin(SysUserLoginDTO userLoginDTO);
+
+    boolean setAdmin(String userid);
 }

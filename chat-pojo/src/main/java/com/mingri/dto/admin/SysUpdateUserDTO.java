@@ -43,9 +43,6 @@ public class SysUpdateUserDTO {
     @NotNull(message = "用户类型不能为空")
     private Integer type;
 
-    @ApiModelProperty("用户荣誉")
-    private List<String> badge;
-
     @ApiModelProperty("用户状态（0正常，1禁用）")
     @TableField(value = "status")
     @NotNull(message = "用户状态不能为空")

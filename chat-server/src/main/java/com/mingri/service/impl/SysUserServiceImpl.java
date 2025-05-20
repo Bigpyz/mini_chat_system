@@ -19,7 +19,9 @@ import com.mingri.dto.user.SysUpdateDTO;
 import com.mingri.dto.user.SysUserLoginDTO;
 import com.mingri.dto.user.SysUserRegisterDTO;
 import com.mingri.entity.LoginUser;
+import com.mingri.entity.SysRole;
 import com.mingri.entity.SysUser;
+import com.mingri.entity.SysUserRole;
 import com.mingri.enumeration.UserStatus;
 import com.mingri.enumeration.UserTypes;
 import com.mingri.exception.BaseException;
@@ -29,10 +31,8 @@ import com.mingri.exception.RegisterFailedException;
 import com.mingri.mapper.SysMenuMapper;
 import com.mingri.mapper.SysUserMapper;
 import com.mingri.result.PageResult;
-import com.mingri.service.IChatListService;
-import com.mingri.service.ISysUserService;
+import com.mingri.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mingri.service.WebSocketService;
 import com.mingri.utils.CacheUtil;
 import com.mingri.utils.RedisUtils;
 import com.mingri.vo.SysUserInfoVO;
@@ -51,6 +51,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -73,7 +77,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private CacheUtil cacheUtil;
     @Autowired
     private IChatListService chatListService;
-
+    @Autowired
+    private IUserOperatedService userOperatedService;
 
     /**
      * @Description: 客户端
@@ -111,6 +116,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //设置账号的状态，默认正常状态 0表示正常 1表示锁定
         sysUser.setStatus(UserStatus.NORMAL);
         sysUser.setBadge(Collections.singletonList("clover"));
+        // 性别默认为男（0男 1女）
+        sysUser.setSex(0);
 
         redisUtils.del(redisKey);
 
@@ -178,6 +185,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             redisUtils.set(RedisConstant.USER_INFO_PREFIX +
                     sysUser.getId(), loginUser);
 
+            // 记录用户登录日志
+            boolean recordLogin = userOperatedService.recordLogin(sysUser.getId(),"127.0.0.1");
+            if (!recordLogin){
+                throw new LoginFailedException("记录登录日志失败！");
+            }
             return sysUser;
 
         } catch (AuthenticationException e) {
@@ -332,33 +344,56 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 
 
-
+///////////////////////////////////////////////////////////////////////////////////////
     /**
      * @Description: 管理端
      * @Author: mingri31164
      * @Date: 2025/5/18 15:07
      **/
 
+
+    @Resource
+    private ISysRoleService sysRoleService;
+    @Resource
+    private ISysUserRoleService sysUserRoleService;
+
     @Override
     public PageResult<SysUserListVO> listUser(PageQuery pageQuery) {
         Page<SysUser> page = pageQuery.toMpPageDefaultSortByCreateTimeDesc();
+        // 查找在线用户id集合
+        List<String> onlineUserList = onlineWeb();
         Page<SysUser> p = lambdaQuery()
                 .ne(SysUser::getDelFlag, -1)
                 .page(page);
         return PageResult.of(p, user -> {
             SysUserListVO vo = com.mingri.utils.BeanUtils.copyProperties(user, SysUserListVO.class);
+            // 判断用户ID是否在在线用户列表中
+            vo.setOnline(onlineUserList.contains(user.getId()));
+            // 计算加入天数（当前日期 - 创建时间）
+            if (user.getCreateTime() != null) {
+                long days = Duration.between(user.getCreateTime().toInstant(), Instant.now()).toDays();
+                vo.setJoinDays(days);
+            } else {
+                vo.setJoinDays(0L); // 创建时间为空时设为 0
+            }
             return vo;
         });
     }
 
     @Override
     public boolean addUser(SysAddUserDTO sysAddUserDTO) {
+        // 检查用户名是否已存在
+        if (lambdaQuery().eq(SysUser::getUserName, sysAddUserDTO.getUserName()).exists()) {
+            throw new RegisterFailedException(MessageConstant.ACCOUNT_EXIST);
+        }
         SysUser user = new SysUser();
         com.mingri.utils.BeanUtils.copyProperties(sysAddUserDTO, user);
         user.setId(IdUtil.simpleUUID());
         user.setStatus(UserStatus.NORMAL);
         user.setBadge(Collections.singletonList("clover"));
         user.setPassword(passwordEncoder.encode(PasswordConstant.DEFAULT_PASSWORD));
+        // 性别默认为男（0男 1女）
+        user.setSex(0);
 
         return save(user);
     }
@@ -376,9 +411,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public boolean deleteUser(String userid) {
-        SysUser user = getById(userid);
-        user.setDelFlag(UserStatus.DELETE.getCode());
-        return updateById(user);
+        // 设置del_flag为-1 表示删除
+//        SysUser user = getById(userid);
+//        user.setDelFlag(UserStatus.DELETE.getCode());
+//        return updateById(user);
+        return removeById(userid);
     }
 
     @Override
@@ -389,6 +426,77 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         com.mingri.utils.BeanUtils.copyProperties(sysUser, sysUpdateUserDTO);
         return sysUpdateUserDTO;
     }
+
+    @Override
+    public SysUser validateLogin(SysUserLoginDTO userLoginDTO) {
+        // 用户在登录页面输入的用户名和密码
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userLoginDTO.getUserName(), userLoginDTO.getPassword());
+        try {
+            // 获取 AuthenticationManager 的 authenticate 方法来进行用户认证
+            Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+            // 认证成功后，提取 LoginUser
+            LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+
+            SysUser sysUser = loginUser.getSysUser();
+            if(!UserTypes.admin.equals(sysUser.getUserType())){
+                throw new LoginFailedException("你不是管理员！");
+            }
+            // 检查用户状态
+            if (sysUser.getStatus().equals(UserStatus.FREEZE)) {
+                throw new LoginFailedException(MessageConstant.ACCOUNT_LOCKED);
+            }
+
+            updateUserBadge(sysUser.getId());
+
+            // 更新用户登录时间 和 等级荣誉
+            sysUser.setLoginTime(new Date());
+            updateUserBadge(sysUser.getId());
+            updateById(sysUser);
+
+            // 把完整的用户信息存入 Redis，其中 userid 作为 key
+            redisUtils.set(RedisConstant.USER_INFO_PREFIX +
+                    sysUser.getId(), loginUser);
+
+            // 记录用户登录日志
+            boolean recordLogin = userOperatedService.recordLogin(sysUser.getId(),"127.0.0.1");
+            if (!recordLogin){
+                throw new LoginFailedException("记录登录日志失败！");
+            }
+
+            return sysUser;
+
+        } catch (AuthenticationException e) {
+            // 认证失败处理
+            throw new LoginFailedException(MessageConstant.LOGIN_ERROR);
+        }
+    }
+
+    @Override
+    public boolean setAdmin(String userid) {
+        SysUser sysUser = getById(userid);
+        if (sysUser != null) {
+            sysUser.setUserType(UserTypes.admin);
+
+            // 直接查询角色表获取 admin 角色 ID
+            SysRole role = sysRoleService.lambdaQuery()
+                    .eq(SysRole::getName, "admin")
+                    .one();
+
+            if (role == null) {
+                throw new BaseException("admin 角色不存在！");
+            }
+
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserId(sysUser.getId());
+            sysUserRole.setRoleId(role.getId());
+
+            return (updateById(sysUser) && sysUserRoleService.save(sysUserRole));
+        } else {
+            throw new BaseException("用户不存在！");
+        }
+    }
+
 
 
 }

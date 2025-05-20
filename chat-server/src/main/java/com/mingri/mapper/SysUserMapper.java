@@ -28,4 +28,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     @ResultMap("UserDtoResultMap")
     Map<String, SysUserInfoVO> listMapUser();
 
+    @Select("SELECT COUNT(*) FROM sys_user WHERE DATE(login_time) = CURDATE()")
+    Integer loginNum();
+
 }

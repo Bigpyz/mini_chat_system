@@ -2,6 +2,7 @@ package com.mingri.enumeration;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
 public enum UserTypes {
 
@@ -10,8 +11,9 @@ public enum UserTypes {
     bot(2, "bot");
 
     @EnumValue
+    @Getter
     private final Integer code;
-    @JsonValue
+    @JsonValue // 枚举值序列化成json时，只返回desc
     private final String desc;
 
     UserTypes(Integer code, String desc) {

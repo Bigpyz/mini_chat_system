@@ -49,11 +49,14 @@ public class SysUserListVO implements Serializable {
     @TableField(value = "user_type")
     private UserTypes type;
 
-    @ApiModelProperty("用户荣誉")
-    private List<String> badge;
-
-    @ApiModelProperty("用户状态（0正常，1禁用）")
+    @ApiModelProperty("用户账号状态（0正常，1禁用）")
     @TableField(value = "status")
     private UserStatus status;
+
+    @ApiModelProperty("用户在线状态")
+    private Boolean online = false;
+
+    @ApiModelProperty("加入时长")
+    private Long joinDays;
 
 }
