@@ -33,5 +33,11 @@ mingri:
     count-limit: 0
     length-limit: 50
     model: ep-20250130211307-qgfnq
+  minio:
+    endpoint: http://127.0.0.1:9000
+    bucketName: chat
+    fileBucketName: file
+    accessKey:
+    secretKey:
 
 

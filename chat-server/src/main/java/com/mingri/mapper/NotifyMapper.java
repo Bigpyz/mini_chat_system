@@ -3,7 +3,8 @@ package com.mingri.mapper;
 import com.mingri.dto.notify.SysNotifyDTO;
 import com.mingri.entity.Notify;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mingri.vo.SysNotifyVO;
+import com.mingri.vo.SysGetNotifyVo;
+import com.mingri.vo.SysNotifyListVO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface NotifyMapper extends BaseMapper<Notify> {
 
     @Select("SELECT id, title, content, image, status, create_time, update_time, create_by " +
             "FROM notify ORDER BY create_time DESC")
-    List<SysNotifyVO> listNotify();
+    List<SysNotifyListVO> listNotify();
 
     @Update("UPDATE notify SET title = #{title}, content = #{content}, image = #{image}, " +
             "status = #{status}, update_time = NOW() WHERE id = #{id}")
@@ -36,5 +37,5 @@ public interface NotifyMapper extends BaseMapper<Notify> {
 
     @Select("SELECT id, title, content, image, status, create_time, update_time, create_by " +
             "FROM notify WHERE id = #{id}")
-    SysNotifyDTO getNotify(String id);
+    SysGetNotifyVo getNotify(String id);
 }

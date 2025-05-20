@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Data
@@ -24,9 +25,9 @@ public class SysUpdateNotifyDTO {
     @TableField("content")
     private String content;
 
-    @ApiModelProperty(value = "图片URL")
+    @ApiModelProperty(value = "图片文件")
     @TableField("image")
-    private String image;
+    private MultipartFile file;
 
     @ApiModelProperty(value = "是否发布")
     @TableField("status")

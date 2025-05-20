@@ -8,7 +8,8 @@ import com.mingri.mapper.NotifyMapper;
 import com.mingri.service.INotifyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mingri.utils.BeanUtils;
-import com.mingri.vo.SysNotifyVO;
+import com.mingri.vo.SysGetNotifyVo;
+import com.mingri.vo.SysNotifyListVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,14 +29,14 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
     @Resource
     private NotifyMapper notifyMapper;
 
-    @Override
-    public boolean addNotify(SysNotifyDTO sysNotifyDTO) {
-        Notify notify = new Notify();
-        BeanUtils.copyProperties(sysNotifyDTO, notify);
-        notify.setId(IdUtil.simpleUUID());
-        notify.setStatus(true);
-        return notifyMapper.saveNotify(notify);
-    }
+//    @Override
+//    public boolean addNotify(SysNotifyDTO sysNotifyDTO) {
+//        Notify notify = new Notify();
+//        BeanUtils.copyProperties(sysNotifyDTO, notify);
+//        notify.setId(IdUtil.simpleUUID());
+//        notify.setStatus(true);
+//        return notifyMapper.saveNotify(notify);
+//    }
 
     @Override
     public boolean deleteNotify(String id) {
@@ -43,7 +44,7 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
     }
 
     @Override
-    public List<SysNotifyVO> listNotify() {
+    public List<SysNotifyListVO> listNotify() {
         return notifyMapper.listNotify();
     }
 
@@ -55,8 +56,29 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
     }
 
     @Override
-    public SysNotifyDTO getNotify(String id) {
+    public SysGetNotifyVo getNotify(String id) {
         return notifyMapper.getNotify(id);
+    }
+
+
+    @Override
+    public boolean addNotifyWithImage(String url, String title, String content) {
+        Notify notify = new Notify();
+        notify.setId(IdUtil.simpleUUID());
+        notify.setTitle(title);
+        notify.setContent(content);
+        notify.setImage(url);
+        notify.setStatus(true);
+        return notifyMapper.saveNotify(notify);
+    }
+
+    @Override
+    public boolean addNotify(SysNotifyDTO sysNotifyDTO) {
+        Notify notify = new Notify();
+        BeanUtils.copyProperties(sysNotifyDTO, notify);
+        notify.setId(IdUtil.simpleUUID());
+        notify.setStatus(true);
+        return notifyMapper.saveNotify(notify);
     }
 
 }

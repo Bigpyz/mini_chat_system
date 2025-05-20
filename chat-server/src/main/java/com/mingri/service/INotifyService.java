@@ -4,7 +4,8 @@ import com.mingri.dto.notify.SysNotifyDTO;
 import com.mingri.dto.notify.SysUpdateNotifyDTO;
 import com.mingri.entity.Notify;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mingri.vo.SysNotifyVO;
+import com.mingri.vo.SysGetNotifyVo;
+import com.mingri.vo.SysNotifyListVO;
 
 import java.util.List;
 
@@ -18,13 +19,17 @@ import java.util.List;
  */
 public interface INotifyService extends IService<Notify> {
 
-    boolean addNotify(SysNotifyDTO sysNotifyDTO);
+//    boolean addNotify(SysNotifyDTO sysNotifyDTO);
 
     boolean deleteNotify(String id);
 
-    List<SysNotifyVO> listNotify();
+    List<SysNotifyListVO> listNotify();
 
     boolean updateNotify(SysUpdateNotifyDTO sysUpdateNotifyDTO);
 
-    SysNotifyDTO getNotify(String id);
+    SysGetNotifyVo getNotify(String id);
+
+    boolean addNotify(SysNotifyDTO sysNotifyDTO);
+
+    boolean addNotifyWithImage(String url, String title, String content);
 }

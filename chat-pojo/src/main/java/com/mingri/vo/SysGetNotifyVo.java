@@ -1,18 +1,22 @@
 package com.mingri.vo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
-
 @Data
-@ApiModel(value = "消息通知返回对象")
-public class SysNotifyVO {
+@ApiModel(value = "消息通知单个返回对象")
+public class SysGetNotifyVo {
+
+    @ApiModelProperty(value = "主键ID")
+    @TableId(value = "id", type = IdType.AUTO)
+    private String id;
 
     @ApiModelProperty(value = "通知标题")
     @TableField("title")
@@ -25,5 +29,5 @@ public class SysNotifyVO {
     @ApiModelProperty(value = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime;
-}
 
+}

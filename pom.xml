@@ -33,6 +33,7 @@
         <poi>3.16</poi>
         <jsqlparser.version>4.4</jsqlparser.version>
         <java.version>17</java.version>
+        <minio.version>8.2.1</minio.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -125,7 +126,11 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi}</version>
             </dependency>
-
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

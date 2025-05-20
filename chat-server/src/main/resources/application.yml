@@ -45,6 +45,14 @@ spring:
     keep-alive: true
 
 
+minio:
+  endpoint: ${mingri.minio.endpoint}
+  bucketName: ${mingri.minio.bucketName}
+  fileBucketName: ${mingri.minio.fileBucketName}
+  accessKey: ${mingri.minio.accessKey}
+  secretKey: ${mingri.minio.secretKey}
+
+
 
 #mybatis:
 #  #mapper配置文件
@@ -66,20 +74,7 @@ mybatis-plus:
     # 全局枚举处理器
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
 
-logging:
-  level:
-    com:
-      mingri:
-        mapper: debug
-        service: info
-        controller: info
 
-mingri:
-  alioss:
-    endpoint: ${mingri.alioss.endpoint}
-    access-key-id: ${mingri.alioss.access-key-id}
-    access-key-secret: ${mingri.alioss.access-key-secret}
-    bucket-name: ${mingri.alioss.bucket-name}
 
 captcha:
   email:
@@ -108,5 +103,13 @@ mini-chat:
     count-limit: ${mingri.doubao.count-limit}
     length-limit: ${mingri.doubao.length-limit}
     model: ${mingri.doubao.model}
+
+logging:
+  level:
+    com:
+      mingri:
+        mapper: debug
+        service: info
+        controller: info
 
 
