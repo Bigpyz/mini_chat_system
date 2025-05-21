@@ -9,6 +9,7 @@ import java.util.List;
 @Mapper
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
+    //查找权限
     List<String> selectPermsByUserId(String id);
 
 }

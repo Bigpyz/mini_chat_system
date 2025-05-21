@@ -13,7 +13,9 @@ import java.util.List;
 @Mapper
 public interface MessageMapper extends BaseMapper<Message> {
 
-
+    /**
+     * 查询聊天记录
+     **/
     @Select("SELECT * " +
             "      FROM `message` " +
             "      WHERE (`from_id` = #{userId} AND `to_id` = #{targetId}) " +
@@ -23,6 +25,9 @@ public interface MessageMapper extends BaseMapper<Message> {
     @ResultMap("RecordVoMap")
     List<Message> record(String userId, String targetId, int index, int num);
 
+    /**
+     * 获取上一条显示时间的消息
+     **/
     @Select("SELECT * " +
             "FROM `message` " +
             "WHERE (`from_id` = #{userId} AND `to_id` = #{targetId}) " +
@@ -30,10 +35,16 @@ public interface MessageMapper extends BaseMapper<Message> {
             "ORDER BY `create_time` DESC LIMIT 1")
     Message getPreviousShowTimeMsg(String userId, String targetId);
 
+    /**
+     * 查询今日的消息数量
+     **/
     @Select("SELECT COUNT(*) FROM message WHERE DATE(create_time) = CURDATE()")
     Integer countTodayMessages();
 
 
+    /**
+     * 查询发言前十的用户榜单
+     **/
     @Select("SELECT u.user_name, u.avatar, COUNT(m.id) AS num " +
             "FROM message m " +
             "JOIN sys_user u ON m.from_id = u.id " +

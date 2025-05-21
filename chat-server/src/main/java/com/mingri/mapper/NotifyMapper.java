@@ -20,21 +20,36 @@ import java.util.List;
 @Mapper
 public interface NotifyMapper extends BaseMapper<Notify> {
 
+    /**
+     * 保存通知
+     **/
     @Insert("INSERT INTO notify (id, title, content, image, status, create_time, update_time, create_by) " +
             "VALUES (#{id}, #{title}, #{content}, #{image}, #{status}, NOW(), NOW(), #{createBy})")
     boolean saveNotify(Notify notify);
 
+    /**
+     * 删除通知
+     **/
     @Delete("DELETE FROM notify WHERE id = #{id}")
     boolean deleteNotify(String id);
 
+    /**
+     * 查询所有通知
+     **/
     @Select("SELECT id, title, content, image, status, create_time, update_time, create_by " +
             "FROM notify ORDER BY create_time DESC")
     List<SysNotifyListVO> listNotify();
 
+    /**
+     * 编辑（更细通知）
+     **/
     @Update("UPDATE notify SET title = #{title}, content = #{content}, image = #{image}, " +
             "status = #{status}, update_time = NOW() WHERE id = #{id}")
     boolean updateNotify(Notify notify);
 
+    /**
+     * 获取某条通知信息
+     **/
     @Select("SELECT id, title, content, image, status, create_time, update_time, create_by " +
             "FROM notify WHERE id = #{id}")
     SysGetNotifyVo getNotify(String id);

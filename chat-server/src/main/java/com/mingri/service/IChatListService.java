@@ -7,8 +7,11 @@ import java.util.List;
 
 
 public interface IChatListService extends IService<ChatList> {
+
     List<ChatList> privateList();
+
     ChatList getGroup();
+
     ChatList create(String targetId);
 
     boolean read(String targetId);

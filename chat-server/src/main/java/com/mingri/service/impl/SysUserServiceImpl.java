@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mingri.constant.*;
 import com.mingri.constant.type.BadgeType;
 import com.mingri.constant.type.NotifyType;
+import com.mingri.constant.type.UserOperatedType;
 import com.mingri.context.BaseContext;
 import com.mingri.dto.admin.SysAddUserDTO;
 import com.mingri.dto.admin.SysUpdateUserDTO;
@@ -59,6 +60,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 
+
 @Service
 @Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService, UserDetailsService {
@@ -86,6 +88,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @Date: 2025/5/18 15:06
      **/
 
+
+    /**
+     * 用户注册
+     **/
     public void register(SysUserRegisterDTO sysUserRegisterDTO) {
 
         // 根据邮箱生成Redis键名
@@ -145,6 +151,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 查询用户权限信息
         //权限集合，在LoginUser类做权限集合的转换
 //        List<String> list = new ArrayList<>(Arrays.asList("test","admin","user"));
+        // 从sys_menu表中查询权限
         List<String> list = sysMenuMapper.selectPermsByUserId(sysUser.getId());
         log.info("权限集合：{}",list);
         //把查询到的user结果，封装成UserDetails类型返回
@@ -186,7 +193,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     sysUser.getId(), loginUser);
 
             // 记录用户登录日志
-            boolean recordLogin = userOperatedService.recordLogin(sysUser.getId(),"127.0.0.1");
+            boolean recordLogin = userOperatedService.recordLoginOprated(sysUser.getId(),"127.0.0.1", UserOperatedType.Login);
             if (!recordLogin){
                 throw new LoginFailedException("记录登录日志失败！");
             }
@@ -204,7 +211,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @Author: mingri31164
      * @Date: 2025/1/21 21:36
      **/
-    public void logout() {
+    public boolean logout() {
         //获取我们在JwtAuthenticationTokenFilter类写的SecurityContextHolder对象中的用户id
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
@@ -216,33 +223,46 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //根据用户id，删除redis中的loginUser，注意我们的key是被 login: 拼接过的，所以下面写完整key的时候要带上 longin:
         String key = RedisConstant.USER_INFO_PREFIX + userid.toString();
         //删除cache中的token值
-        cacheUtil.clearUserSessionCache(userid.toString());
-        redisUtils.del(key);
+        cacheUtil.clearUserSessionCache(userid);
+        // 记录用户登录日志
+        boolean recordLogin = userOperatedService.recordLoginOprated(userid,"127.0.0.1", UserOperatedType.Logout);
+        if (!recordLogin){
+            throw new LoginFailedException("记录登录日志失败！");
+        }
+        return redisUtils.del(key);
     }
 
+
+    /**
+     * 通过id获取用户信息
+     **/
     @Override
     @DS("slave")
     public SysUserInfoVO getUserById(String userId) {
         return baseMapper.getUserById(userId);
     }
 
-    @Override
-    @DS("slave")
-    public List<SysUserInfoVO> listUser() {
-        return baseMapper.listUser();
-    }
 
+    /**
+     * 获取所有在线用户信息
+     **/
     @Override
     public List<String> onlineWeb() {
         return webSocketService.getOnlineUser();
     }
 
+    /**
+     * 查询所有用户信息
+     **/
     @Override
     @DS("slave")
     public Map<String, SysUserInfoVO> listMapUser() {
         return baseMapper.listMapUser();
     }
 
+    /**
+     * 用户上线时，发送一个上线通知给前端
+     **/
     @Override
     public void online(String userId) {
         NotifyDto notifyDto = new NotifyDto();
@@ -252,6 +272,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         webSocketService.sendNotifyToGroup(notifyDto);
     }
 
+
+    /**
+     * 用户离线时，向前端广播离线通知
+     **/
     @Override
     public void offline(String userId) {
         NotifyDto notifyDto = new NotifyDto();
@@ -264,6 +288,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         webSocketService.sendNotifyToGroup(notifyDto);
     }
 
+
+    /**
+     * 清理过期用户
+     **/
     @Override
     public void deleteExpiredUsers(LocalDate expirationDate) {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
@@ -273,6 +301,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+
+    /**
+     * 更新用户勋章
+     **/
     @Override
     public void updateUserBadge(String id) {
         SysUser user = getById(id);
@@ -312,6 +344,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+
+    /**
+     * 初始化豆包机器人（暂未使用该方法）
+     **/
     @Override
     public void initBotUser() {
         SysUser doubao = getById("doubao");
@@ -325,6 +361,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+
+    /**
+     * 更新用户个人信息
+     **/
     @Override
     public boolean updateSelf(SysUpdateDTO sysUpdateDTO) {
         SysUser user = lambdaQuery().eq(SysUser::getUserName, sysUpdateDTO.getName()).one();
@@ -357,7 +397,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Resource
     private ISysUserRoleService sysUserRoleService;
 
+
+    /**
+     * 管理端查询所有用户信息
+     **/
     @Override
+    @DS("slave")
     public PageResult<SysUserListVO> listUser(PageQuery pageQuery) {
         Page<SysUser> page = pageQuery.toMpPageDefaultSortByCreateTimeDesc();
         // 查找在线用户id集合
@@ -380,6 +425,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         });
     }
 
+
+    /**
+     * 管理端新增用户
+     **/
     @Override
     public boolean addUser(SysAddUserDTO sysAddUserDTO) {
         // 检查用户名是否已存在
@@ -398,6 +447,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return save(user);
     }
 
+
+    /**
+     * 管理端编辑用户信息
+     **/
     @Override
     public boolean updateUser(SysUpdateUserDTO sysUpdateUserDTO) {
         SysUser sysUser = lambdaQuery().eq(SysUser::getUserName, sysUpdateUserDTO.getUserName()).one();
@@ -409,16 +462,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return updateById(user);
     }
 
+
+    /**
+     * 管理端删除用户
+     **/
     @Override
     public boolean deleteUser(String userid) {
-        // 设置del_flag为-1 表示删除
+        // 设置del_flag为-1 表示删除（软删除）
 //        SysUser user = getById(userid);
 //        user.setDelFlag(UserStatus.DELETE.getCode());
 //        return updateById(user);
+
+        // 硬删除
         return removeById(userid);
     }
 
+
+    /**
+     * 管理端编辑用户信息时用于信息回显
+     **/
     @Override
+    @DS("slave")
     public SysUpdateUserDTO getUser(String userid) {
         SysUser sysUser = getById(userid);
         log.info("获取到该用户:{}", sysUser);
@@ -427,6 +491,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return sysUpdateUserDTO;
     }
 
+
+    /**
+     * 管理端登录
+     **/
     @Override
     public SysUser validateLogin(SysUserLoginDTO userLoginDTO) {
         // 用户在登录页面输入的用户名和密码
@@ -439,6 +507,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
 
             SysUser sysUser = loginUser.getSysUser();
+            // 判断是否为管理员
             if(!UserTypes.admin.equals(sysUser.getUserType())){
                 throw new LoginFailedException("你不是管理员！");
             }
@@ -459,7 +528,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     sysUser.getId(), loginUser);
 
             // 记录用户登录日志
-            boolean recordLogin = userOperatedService.recordLogin(sysUser.getId(),"127.0.0.1");
+            boolean recordLogin = userOperatedService.recordLoginOprated(sysUser.getId(),"127.0.0.1", UserOperatedType.Login);
             if (!recordLogin){
                 throw new LoginFailedException("记录登录日志失败！");
             }
@@ -472,6 +541,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+
+    /**
+     * 设置用户为管理员
+     **/
     @Override
     public boolean setAdmin(String userid) {
         SysUser sysUser = getById(userid);

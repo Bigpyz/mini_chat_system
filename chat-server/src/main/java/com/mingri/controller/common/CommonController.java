@@ -22,13 +22,6 @@ public class CommonController {
     @Autowired
     private CommonService commonService;
 
-
-
-    /**
-     * @Description: 发送邮箱验证码
-     * @Author: mingri31164
-     * @Date: 2025/1/20 0:01
-     **/
         @ApiOperation("发送邮箱验证码")
         @GetMapping("/get-code")
         public Result<String> sendEmailCaptcha(String email) {

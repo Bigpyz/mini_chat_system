@@ -42,18 +42,6 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
-    /**
-     * 自定义权限认证注解测试
-     **/
-//    @RequestMapping("/hello")
-//    @PreAuthorize("hasAuthority('system:dept:list')") //单个权限
-////    @PreAuthorize("hasAnyAuthority('user','admin')") //多个权限（只要有其中之一）
-////    @PreAuthorize("hasRole('user')") //内部拼接(ROLE_user)比对
-////    @PreAuthorize("@myEx.hasAuthority('system:dept:list')") //自定义权限校验
-//    public String hello(){
-//        return "欢迎，开始你新的学习旅程吧";
-//    }
-
 
     @UrlLimit(keyType = LimitKeyType.IP)
     @ApiOperation("管理端登录")
@@ -104,8 +92,8 @@ public class UserController {
 
     @ApiOperation("删除用户")
     @PreAuthorize("hasAuthority('sys:user')")
-    @PostMapping("/delete")
-    public Object deleteUser(@RequestParam String userid) {
+    @PostMapping("/delete/{userid}")
+    public Object deleteUser(@PathVariable String userid) {
         boolean result = sysUserService.deleteUser(userid);
         return Result.ResultByFlag(result);
     }
@@ -123,16 +111,16 @@ public class UserController {
 
     @ApiOperation("获取用户信息")
     @PreAuthorize("hasAuthority('sys:user')")
-    @GetMapping("/get")
-    public Object getUserById(@RequestParam  String userid){
+    @GetMapping("/get/{userid}")
+    public Object getUserById(@PathVariable String userid){
         SysUpdateUserDTO result = sysUserService.getUser(userid);
         return Result.success(result);
     }
 
     @ApiOperation("设为管理员")
     @PreAuthorize("hasAuthority('sys:user')")
-    @GetMapping("/setAdmin")
-    public Object setAdmin(@RequestParam  String userid){
+    @GetMapping("/setAdmin/{userid}")
+    public Object setAdmin(@PathVariable  String userid){
         boolean result = sysUserService.setAdmin(userid);
         return Result.ResultByFlag(result);
     }

@@ -27,7 +27,7 @@ public class SysUpdateNotifyDTO {
 
     @ApiModelProperty(value = "图片文件")
     @TableField("image")
-    private MultipartFile file;
+    private String image;
 
     @ApiModelProperty(value = "是否发布")
     @TableField("status")

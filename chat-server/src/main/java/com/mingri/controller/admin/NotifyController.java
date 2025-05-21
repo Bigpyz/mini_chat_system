@@ -11,6 +11,7 @@ import com.mingri.vo.SysGetNotifyVo;
 import com.mingri.vo.SysNotifyListVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +38,7 @@ public class NotifyController {
     private MinioUtil minioUtil;
 
     @ApiOperation("添加文本通知")
+    @PreAuthorize("hasAuthority('sys:notify')")
     @PostMapping("/add")
     public Object addNotify(@RequestBody SysNotifyDTO sysNotifyDTO) {
         boolean result = notifyService.addNotify(sysNotifyDTO);
@@ -44,6 +46,7 @@ public class NotifyController {
     }
 
     @ApiOperation("添加图片通知")
+    @PreAuthorize("hasAuthority('sys:notify')")
     @PostMapping("/addWithImage")
     public Object addNotifyWithImage(@NotNull(message = "图片不能为空~") @RequestParam("file") MultipartFile file,
                             @NotNull(message = "标题不能为空~") @RequestParam("title") String title,
@@ -60,14 +63,16 @@ public class NotifyController {
     }
 
     @ApiOperation("删除通知")
-    @PostMapping("/delete")
-    public Object deleteNotify(@RequestParam String id) {
+    @PreAuthorize("hasAuthority('sys:notify')")
+    @PostMapping("/delete/{id}")
+    public Object deleteNotify(@PathVariable String id) {
         boolean result = notifyService.deleteNotify(id);
         return Result.ResultByFlag(result);
     }
 
 
     @ApiOperation("更新通知")
+    @PreAuthorize("hasAuthority('sys:notify')")
     @PostMapping("/update")
     public Object updateNotify(@RequestBody SysUpdateNotifyDTO sysUpdateNotifyDTO) {
         boolean result = notifyService.updateNotify(sysUpdateNotifyDTO);
@@ -75,6 +80,7 @@ public class NotifyController {
     }
 
     @ApiOperation("查询所有通知")
+    @PreAuthorize("hasAuthority('sys:notify')")
     @GetMapping("/list")
     public Object listNotify() {
         List<SysNotifyListVO> result = notifyService.listNotify();
@@ -82,8 +88,9 @@ public class NotifyController {
     }
 
     @ApiOperation("查询单个通知")
-    @GetMapping("/get")
-    public Object getNotify(@RequestParam String id) {
+    @PreAuthorize("hasAuthority('sys:notify')")
+    @GetMapping("/get/{id}")
+    public Object getNotify(@PathVariable String id) {
         SysGetNotifyVo result = notifyService.getNotify(id);
         return Result.success(result);
     }

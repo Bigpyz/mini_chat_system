@@ -1,6 +1,7 @@
 package com.mingri.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.mingri.constant.type.UserOperatedType;
 import com.mingri.entity.UserOperated;
 import com.mingri.mapper.MessageMapper;
@@ -38,7 +39,11 @@ public class UserOperatedServiceImpl extends ServiceImpl<UserOperatedMapper, Use
     MessageMapper messageMapper;
 
 
+    /**
+     * 管理端主页用户活跃数据（登录的用户数量，在线用户数量，今日消息数量）
+     **/
     @Override
+    @DS("slave")
     public SysNumInfo numInfo() {
         SysNumInfo numInfo = new SysNumInfo();
         Integer loginNum =  sysUserMapper.loginNum();
@@ -50,26 +55,39 @@ public class UserOperatedServiceImpl extends ServiceImpl<UserOperatedMapper, Use
         return numInfo;
     }
 
+
+    /**
+     * 查询用户登录日志
+     **/
     @Override
     public List<UserOperatedVO> loginDetails() {
         List<UserOperatedVO> result = userOperatedMapper.loginDetails();
         return result;
     }
 
-    @Override
-    public boolean recordLogin(String id, String ip) {
-        UserOperated operated = new UserOperated();
-        operated.setId(IdUtil.randomUUID());
-        operated.setUserId(id);
-        operated.setAddress(ip);
-        operated.setType(UserOperatedType.Login);
-        return save(operated);
-    }
 
+    /**
+     * 查询今日发送消息数量前 10 的用户榜单
+     **/
     @Override
+    @DS("slave")
     public List<Top10MsgDto> getTop10Msg() {
         List<Top10MsgDto> result = messageMapper.getTop10Msg();
-        return result;    }
+        return result;
+    }
+
+
+    /**
+     * 记录用户登录日志
+     **/
+    @Override
+    public boolean recordLoginOprated(String userid, String ip, String type) {
+        UserOperated operated = new UserOperated();
+        operated.setId(IdUtil.randomUUID());
+        operated.setUserId(userid);
+        operated.setAddress(ip);
+        operated.setType(type);
+        return save(operated);    }
 
 
 }

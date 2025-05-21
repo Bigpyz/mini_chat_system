@@ -24,11 +24,9 @@ public interface ISysUserService extends IService<SysUser> {
 
     void register(SysUserRegisterDTO userRegisterDTO);
 
-    void logout();
+    boolean logout();
 
     SysUserInfoVO getUserById(String userId);
-
-    List<SysUserInfoVO> listUser();
 
     List<String> onlineWeb();
 

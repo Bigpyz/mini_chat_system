@@ -24,7 +24,7 @@ public class ExpiredClearTask {
 
 
     /**
-     * @Description: 过期消息处理
+     * @Description: 过期消息和用户处理
      * @Author: mingri31164
      * @Date: 2025/1/27 19:38
      **/

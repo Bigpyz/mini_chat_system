@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +42,6 @@ public class SysUserController {
     private CacheUtil cacheUtil;
 
 
-    /**
-     * 登录
-     */
     @UrlLimit(keyType = LimitKeyType.IP)
     @ApiOperation("用户登录")
     @PostMapping("/login")
@@ -73,9 +72,7 @@ public class SysUserController {
 
 
 
-    /**
-     * 用户注册
-     **/
+
     @UrlLimit(keyType = LimitKeyType.IP)
     @PostMapping("/register")
     @ApiOperation("用户注册")
@@ -87,31 +84,24 @@ public class SysUserController {
 
 
 
-    /**
-     * 退出
-     * @return
-     */
+
     @UrlLimit
     @ApiOperation("退出登录")
     @PostMapping("/logout")
-    public Result<String> logout() {
-        iSysUserService.logout();
-        return Result.success();
+    public Object logout() {
+        boolean result = iSysUserService.logout();
+        return Result.ResultByFlag(result);
     }
 
 
-    /**
-     * 编辑用户个人信息
-     * @param sysUpdateDTO
-     * @return
-     */
+
     @UrlLimit
-    @PutMapping("/update")
+    @PostMapping("/update")
     @ApiOperation("编辑用户信息")
-    public Result update(@RequestBody SysUpdateDTO sysUpdateDTO){
+    public Object update(@RequestBody SysUpdateDTO sysUpdateDTO){
         log.info("编辑用户信息：{}", sysUpdateDTO);
-        iSysUserService.updateSelf(sysUpdateDTO);
-        return Result.success();
+        boolean  result = iSysUserService.updateSelf(sysUpdateDTO);
+        return Result.ResultByFlag(result);
     }
 
 

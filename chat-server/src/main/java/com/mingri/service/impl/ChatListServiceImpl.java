@@ -30,6 +30,10 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
     @Autowired
     private ISysUserService sysUserService;
 
+
+    /**
+     * 获取私聊列表
+     **/
     @Override
     @DS("slave")
     public List<ChatList> privateList() {
@@ -40,6 +44,9 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return list(queryWrapper);
     }
 
+    /**
+     * 获取群聊信息
+     **/
     @Override
     @DS("slave")
     public ChatList getGroup() {
@@ -65,6 +72,10 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return chat;
     }
 
+
+    /**
+     * 创建私聊
+     **/
     @Override
     public ChatList create(String targetId) {
         String userId = BaseContext.getCurrentId();
@@ -87,7 +98,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
     }
 
     /**
-     * @Description: 是否已读
+     * @Description: 标记消息已读
      * @Author: mingri31164
      * @Date: 2025/1/26 1:55
      **/
@@ -102,11 +113,18 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return update(new ChatList(), updateWrapper);
     }
 
+
+    /**
+     * 从私聊列表删除某条私聊记录
+     **/
     @Override
     public boolean delete(String chatListId) {
         return removeById(chatListId);
     }
 
+    /**
+     * 更新私聊列表
+     **/
     @Override
     public boolean updateChatListPrivate(String targetId, Message message) {
         String userId = BaseContext.getCurrentId();
@@ -116,6 +134,9 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return updateChatList(userId, targetId, message);
     }
 
+    /**
+     * 获取群聊列表
+     **/
     @Override
     public boolean updateChatListGroup(Message message) {
         LambdaUpdateWrapper<ChatList> updateWrapper = new LambdaUpdateWrapper<>();
@@ -124,6 +145,9 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return update(updateWrapper);
     }
 
+    /**
+     * 更新聊天列表（方法）
+     **/
     public boolean updateChatList(String userId, String targetId, Message message) {
         //判断聊天列表是否存在
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();
@@ -147,6 +171,10 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         }
     }
 
+
+    /**
+     * 获取对方目标的消息列表（便于同时更新双方的聊天列表）
+     **/
     @DS("slave")
     private ChatList getTargetChatList(String targetId) {
         String userId = BaseContext.getCurrentId();

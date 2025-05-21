@@ -20,6 +20,7 @@ import java.util.List;
 public interface UserOperatedMapper extends BaseMapper<UserOperated> {
 
 
+    // 查询登录日志
     List<UserOperatedVO> loginDetails();
 
 

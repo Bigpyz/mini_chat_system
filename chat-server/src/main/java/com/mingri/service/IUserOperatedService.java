@@ -22,7 +22,7 @@ public interface IUserOperatedService extends IService<UserOperated> {
 
     List<UserOperatedVO> loginDetails();
 
-    boolean recordLogin(String id, String ip);
-
     List<Top10MsgDto> getTop10Msg();
+
+    boolean recordLoginOprated(String userid, String ip, String type);
 }

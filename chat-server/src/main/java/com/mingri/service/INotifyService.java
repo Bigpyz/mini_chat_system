@@ -19,8 +19,6 @@ import java.util.List;
  */
 public interface INotifyService extends IService<Notify> {
 
-//    boolean addNotify(SysNotifyDTO sysNotifyDTO);
-
     boolean deleteNotify(String id);
 
     List<SysNotifyListVO> listNotify();

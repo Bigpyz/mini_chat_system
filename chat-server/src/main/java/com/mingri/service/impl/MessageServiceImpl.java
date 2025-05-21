@@ -54,9 +54,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     private SensitiveWordBs sensitiveWordBs;
     @Autowired
     private AiChatService aiChatService;
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
 
+    /**
+     * 发送消息
+     **/
     @Override
     public Message send(SendMessageDTO sendMessageDTO) {
         if (MessageSource.Group.equals(sendMessageDTO.getSource())) {
@@ -66,6 +67,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         }
     }
 
+    /**
+     * 查询聊天记录
+     **/
     @Override
     @DS("slave")
     public List<Message> record(RecordDTO recordDTO) {
@@ -76,6 +80,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return messages;
     }
 
+    /**
+     * 撤回消息
+     **/
     @Override
     public Message recall(RecallDTO recallDTO) {
         String userId = BaseContext.getCurrentId();
@@ -104,6 +111,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         }
         return message;    }
 
+
+    /**
+     * 清理过期消息
+     **/
     @Override
     public void deleteExpiredMessages(LocalDate expirationDate) {
         LambdaQueryWrapper<Message> queryWrapper = new LambdaQueryWrapper<>();
@@ -113,6 +124,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         }
     }
 
+
+    /**
+     * 发送群聊消息（方法）
+     **/
     @Override
     public Message sendMessageToGroup(String userId, SendMessageDTO sendMessageDTO) {
         Message message = sendMessage(userId, sendMessageDTO, MessageSource.Group);
@@ -122,6 +137,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return message;
     }
 
+
+    /**
+     * 发送私聊消息（方法）
+     **/
     private Message sendMessageToUser(SendMessageDTO sendMessageDTO) {
         String userId = BaseContext.getCurrentId();
         String targetId = sendMessageDTO.getTargetId();
@@ -132,6 +151,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
 
+    /**
+     * 公用的发送消息方法（方法）
+     **/
     public Message sendMessage(String userId, SendMessageDTO sendMessageDTO, String source) {
         //获取上一条显示时间的消息
         Message previousMessage = messageMapper.getPreviousShowTimeMsg(userId, sendMessageDTO.getTargetId());
