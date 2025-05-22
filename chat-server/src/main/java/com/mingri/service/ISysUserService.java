@@ -48,7 +48,7 @@ public interface ISysUserService extends IService<SysUser> {
 
 
     // 管理端
-    PageResult<SysUserListVO> listUser(PageQuery pageQuery);
+    List<SysUserListVO> listUser();
 
     boolean addUser(SysAddUserDTO sysAddUserDTO);
 
@@ -61,4 +61,9 @@ public interface ISysUserService extends IService<SysUser> {
     SysUser validateLogin(SysUserLoginDTO userLoginDTO);
 
     boolean setAdmin(String userid);
+
+    boolean cancelAdmin(String userid);
+
+
+
 }

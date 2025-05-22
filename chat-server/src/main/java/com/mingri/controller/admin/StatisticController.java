@@ -27,7 +27,7 @@ public class StatisticController {
 
 
     @ApiOperation("今日登录详情")
-    @PreAuthorize("hasAuthority('sys:index')")
+//    @PreAuthorize("hasAuthority('sys:index')")
     @GetMapping("/login/details")
     @UrlResource("admin")
     public Object loginDetails() {
@@ -37,7 +37,7 @@ public class StatisticController {
 
 
     @ApiOperation("今日活跃数量信息")
-    @PreAuthorize("hasAuthority('sys:index')")
+//    @PreAuthorize("hasAuthority('sys:index')")
     @GetMapping("/num/info")
     @UrlResource("admin")
     public Object numInfo() {
@@ -47,7 +47,7 @@ public class StatisticController {
 
 
     @ApiOperation("发送消息top10用户")
-    @PreAuthorize("hasAuthority('sys:index')")
+//    @PreAuthorize("hasAuthority('sys:index')")
     @GetMapping("/top10")
     @UrlResource("admin")
     public Object top10Msg() {

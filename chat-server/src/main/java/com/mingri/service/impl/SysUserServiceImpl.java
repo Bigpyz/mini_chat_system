@@ -6,7 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mingri.constant.*;
 import com.mingri.constant.type.BadgeType;
 import com.mingri.constant.type.NotifyType;
@@ -15,7 +15,6 @@ import com.mingri.context.BaseContext;
 import com.mingri.dto.admin.SysAddUserDTO;
 import com.mingri.dto.admin.SysUpdateUserDTO;
 import com.mingri.dto.message.NotifyDto;
-import com.mingri.dto.page.PageQuery;
 import com.mingri.dto.user.SysUpdateDTO;
 import com.mingri.dto.user.SysUserLoginDTO;
 import com.mingri.dto.user.SysUserRegisterDTO;
@@ -31,7 +30,6 @@ import com.mingri.exception.LoginFailedException;
 import com.mingri.exception.RegisterFailedException;
 import com.mingri.mapper.SysMenuMapper;
 import com.mingri.mapper.SysUserMapper;
-import com.mingri.result.PageResult;
 import com.mingri.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mingri.utils.CacheUtil;
@@ -180,8 +178,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             if (sysUser.getStatus().equals(UserStatus.FREEZE)) {
                 throw new LoginFailedException(MessageConstant.ACCOUNT_LOCKED);
             }
-
-            updateUserBadge(sysUser.getId());
 
             // 更新用户登录时间 和 等级荣誉
             sysUser.setLoginTime(new Date());
@@ -396,6 +392,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private ISysRoleService sysRoleService;
     @Resource
     private ISysUserRoleService sysUserRoleService;
+    @Resource
+    private SysUserMapper sysUserMapper;
 
 
     /**
@@ -403,26 +401,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      **/
     @Override
     @DS("slave")
-    public PageResult<SysUserListVO> listUser(PageQuery pageQuery) {
-        Page<SysUser> page = pageQuery.toMpPageDefaultSortByCreateTimeDesc();
-        // 查找在线用户id集合
+    public List<SysUserListVO> listUser() {
+        // 获取所有用户
+        List<SysUserListVO> userList = sysUserMapper.listAllUsers();
+
+        // 获取在线用户 ID 列表
         List<String> onlineUserList = onlineWeb();
-        Page<SysUser> p = lambdaQuery()
-                .ne(SysUser::getDelFlag, -1)
-                .page(page);
-        return PageResult.of(p, user -> {
-            SysUserListVO vo = com.mingri.utils.BeanUtils.copyProperties(user, SysUserListVO.class);
-            // 判断用户ID是否在在线用户列表中
-            vo.setOnline(onlineUserList.contains(user.getId()));
+
+        // 补充“是否在线”字段
+        for (SysUserListVO vo : userList) {
+            vo.setOnline(onlineUserList.contains(vo.getId()));
             // 计算加入天数（当前日期 - 创建时间）
-            if (user.getCreateTime() != null) {
-                long days = Duration.between(user.getCreateTime().toInstant(), Instant.now()).toDays();
+            if (vo.getCreateTime() != null) {
+                long days = Duration.between(vo.getCreateTime().toInstant(), Instant.now()).toDays();
                 vo.setJoinDays(days);
             } else {
                 vo.setJoinDays(0L); // 创建时间为空时设为 0
             }
-            return vo;
-        });
+        }
+
+        return userList;
     }
 
 
@@ -453,9 +451,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      **/
     @Override
     public boolean updateUser(SysUpdateUserDTO sysUpdateUserDTO) {
-        SysUser sysUser = lambdaQuery().eq(SysUser::getUserName, sysUpdateUserDTO.getUserName()).one();
-        if (sysUser != null) {
-            throw new BaseException(MessageConstant.ACCOUNT_EXIST);
+        SysUser sysUser = lambdaQuery().eq(SysUser::getId, sysUpdateUserDTO.getId()).one();
+        if (sysUser == null) {
+            throw new BaseException(MessageConstant.USER_NOT_EXIST);
         }
         SysUser user = new SysUser();
         com.mingri.utils.BeanUtils.copyProperties(sysUpdateUserDTO, user);
@@ -516,8 +514,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 throw new LoginFailedException(MessageConstant.ACCOUNT_LOCKED);
             }
 
-            updateUserBadge(sysUser.getId());
-
             // 更新用户登录时间 和 等级荣誉
             sysUser.setLoginTime(new Date());
             updateUserBadge(sysUser.getId());
@@ -547,6 +543,33 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      **/
     @Override
     public boolean setAdmin(String userid) {
+        SysUser sysUser = getById(userid);
+        if (sysUser != null) {
+            sysUser.setUserType(UserTypes.admin);
+
+            // 直接查询角色表获取 admin 角色 ID
+            SysRole role = sysRoleService.lambdaQuery()
+                    .eq(SysRole::getName, "admin")
+                    .one();
+
+            if (role == null) {
+                throw new BaseException("admin 角色不存在！");
+            }
+
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserId(sysUser.getId());
+            sysUserRole.setRoleId(role.getId());
+
+            return (updateById(sysUser) && sysUserRoleService.save(sysUserRole));
+        } else {
+            throw new BaseException("用户不存在！");
+        }
+    }
+
+
+
+    @Override
+    public boolean cancelAdmin(String userid) {
         SysUser sysUser = getById(userid);
         if (sysUser != null) {
             sysUser.setUserType(UserTypes.admin);

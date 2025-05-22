@@ -13,7 +13,9 @@ public enum UserTypes {
     @EnumValue
     @Getter
     private final Integer code;
-    @JsonValue // 枚举值序列化成json时，只返回desc
+
+    @JsonValue // 枚举值序列化成json时，只返回code
+    @Getter
     private final String desc;
 
     UserTypes(Integer code, String desc) {

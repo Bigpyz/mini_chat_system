@@ -41,7 +41,7 @@ public class SysUpdateUserDTO {
     @ApiModelProperty("用户类型（0管理员，1普通用户，2机器人）")
     @TableField(value = "user_type")
     @NotNull(message = "用户类型不能为空")
-    private Integer type;
+    private Integer userType;
 
     @ApiModelProperty("用户状态（0正常，1禁用）")
     @TableField(value = "status")

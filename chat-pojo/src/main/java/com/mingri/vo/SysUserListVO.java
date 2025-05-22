@@ -1,5 +1,6 @@
 package com.mingri.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mingri.enumeration.UserStatus;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -47,11 +49,15 @@ public class SysUserListVO implements Serializable {
 
     @ApiModelProperty("用户类型（0管理员，1普通用户，2机器人）")
     @TableField(value = "user_type")
-    private UserTypes type;
+    private UserTypes userType;
 
     @ApiModelProperty("用户账号状态（0正常，1禁用）")
     @TableField(value = "status")
     private UserStatus status;
+
+    @ApiModelProperty(value = "创建时间")
+    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    private Date createTime;
 
     @ApiModelProperty("用户在线状态")
     private Boolean online = false;

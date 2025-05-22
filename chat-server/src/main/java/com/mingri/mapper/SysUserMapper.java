@@ -3,6 +3,7 @@ package com.mingri.mapper;
 import com.mingri.entity.SysUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mingri.vo.SysUserInfoVO;
+import com.mingri.vo.SysUserListVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.ResultMap;
@@ -23,7 +24,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     SysUserInfoVO getUserById(String userId);
 
     /**
-     * 查询所有用户信息
+     * 查询所有用户信息（Map集合--前端主页）
      **/
     @Select("SELECT * FROM sys_user ORDER BY user_type DESC")
     @MapKey("id")
@@ -36,4 +37,8 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     @Select("SELECT COUNT(*) FROM sys_user WHERE DATE(login_time) = CURDATE()")
     Integer loginNum();
 
+    /**
+     * 查询所有用户信息（List集合--管理端用户列表）
+     **/
+    List<SysUserListVO> listAllUsers();
 }
