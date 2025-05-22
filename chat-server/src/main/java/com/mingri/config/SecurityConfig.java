@@ -53,19 +53,19 @@ public class SecurityConfig  {
 				sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 使用无状态会话
 				.and()
 				.authorizeRequests()
-						.anyRequest().permitAll(); //放行所有（测试）
-//				.antMatchers("/api/v1/user/login","/api/v1/user/register","/api/v1/file",
-//						"/api/v1/file","/api/v1/common/**",
-//						"/ws/**",
-//						"/v2/api-docs",
-//						"/swagger-resources/configuration/ui",
-//						"/swagger-resources",
-//						"/swagger-resources/configuration/security",
-//						"/doc.html",
-//						"/swagger-ui.html",
-//						"/webjars/**").anonymous()// 接口允许匿名访问（已登录不可访问，未登录可以）
-////				.antMatchers("/admin-user").hasAuthority("system:dept:list") //配置指定路径接口需要权限访问
-//				.anyRequest().authenticated(); // 其他请求需要认证
+//				.anyRequest().permitAll(); //放行所有（测试）
+				.antMatchers("/api/v1/user/login","/api/v1/user/register","/api/v1/file",
+						"/api/v1/file","/api/v1/common/**",
+						"/ws/**",
+						"/v2/api-docs",
+						"/swagger-resources/configuration/ui",
+						"/swagger-resources",
+						"/swagger-resources/configuration/security",
+						"/doc.html",
+						"/swagger-ui.html",
+						"/webjars/**").anonymous()// 接口允许匿名访问（已登录不可访问，未登录可以）
+//				.antMatchers("/admin-user").hasAuthority("system:dept:list") //配置指定路径接口需要权限访问
+				.anyRequest().authenticated(); // 其他请求需要认证
 
 		//把token校验过滤器添加到过滤器链中
 		http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);

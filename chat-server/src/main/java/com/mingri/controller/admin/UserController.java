@@ -70,7 +70,7 @@ public class UserController {
 
 
     @ApiOperation("查询所有用户信息")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @GetMapping("/list")
     public Object listUser() {
         List<SysUserListVO> result = sysUserService.listUser();
@@ -79,7 +79,7 @@ public class UserController {
 
 
     @ApiOperation("添加用户")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @PostMapping("/add")
     public Object addUser(@RequestBody SysAddUserDTO sysAddUserDTO) {
         boolean result = sysUserService.addUser(sysAddUserDTO);
@@ -88,7 +88,7 @@ public class UserController {
 
 
     @ApiOperation("删除用户")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @PostMapping("/delete/{userid}")
     public Object deleteUser(@PathVariable String userid) {
         boolean result = sysUserService.deleteUser(userid);
@@ -97,7 +97,7 @@ public class UserController {
 
 
     @ApiOperation("编辑用户信息")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @PostMapping("/update")
     public Object update(@RequestBody SysUpdateUserDTO sysUpdateUserDTO){
         log.info("编辑用户信息：{}", sysUpdateUserDTO);
@@ -108,7 +108,7 @@ public class UserController {
 
 
     @ApiOperation("获取用户信息")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @GetMapping("/get/{userid}")
     public Object getUserById(@PathVariable String userid){
         SysUpdateUserDTO result = sysUserService.getUser(userid);
@@ -116,7 +116,7 @@ public class UserController {
     }
 
     @ApiOperation("设为管理员")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @PostMapping("/setAdmin/{userid}")
     public Object setAdmin(@PathVariable  String userid){
         boolean result = sysUserService.setAdmin(userid);
@@ -125,7 +125,7 @@ public class UserController {
 
 
     @ApiOperation("撤销管理员")
-//    @PreAuthorize("hasAuthority('sys:user')")
+    @PreAuthorize("hasAuthority('sys:user')")
     @PostMapping("/cancelAdmin/{userid}")
     public Object cancelAdmin(@PathVariable  String userid){
         boolean result = sysUserService.cancelAdmin(userid);
