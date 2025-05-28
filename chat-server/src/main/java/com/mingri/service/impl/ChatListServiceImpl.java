@@ -29,13 +29,15 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
 
     @Autowired
     private ISysUserService sysUserService;
+    @Autowired
+    private ChatListMapper chatListMapper;
 
 
     /**
      * 获取私聊列表
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public List<ChatList> privateList() {
         String currentId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();
@@ -48,7 +50,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
      * 获取群聊信息
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public ChatList getGroup() {
         String userId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();
@@ -145,6 +147,11 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
         return update(updateWrapper);
     }
 
+    @Override
+    public Integer getUnReadNum() {
+        return chatListMapper.getUnReadNum();
+    }
+
     /**
      * 更新聊天列表（方法）
      **/
@@ -175,7 +182,7 @@ public class ChatListServiceImpl extends ServiceImpl<ChatListMapper, ChatList> i
     /**
      * 获取对方目标的消息列表（便于同时更新双方的聊天列表）
      **/
-    @DS("slave")
+    //@DS("slave")
     private ChatList getTargetChatList(String targetId) {
         String userId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ChatList> queryWrapper = new LambdaQueryWrapper<>();

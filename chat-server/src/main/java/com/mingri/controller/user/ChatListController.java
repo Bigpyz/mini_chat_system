@@ -72,4 +72,12 @@ public class ChatListController {
         return Result.success(result);
     }
 
+
+    @ApiOperation("统计未读消息的总数")
+    @PostMapping("/getUnReadNum")
+    public Object getUnReadNum() {
+        Integer result = chatListService.getUnReadNum();
+        return Result.success(result);
+    }
+
 }

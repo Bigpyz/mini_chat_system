@@ -134,5 +134,13 @@ public class UserController {
 
 
 
+    @ApiOperation("统计5月22号之后登录用户的数量")
+//    @PreAuthorize("hasAuthority('sys:user')")
+    @PostMapping("/get/loginNum")
+    public Object getLoginNum(){
+        Integer result = sysUserService.getLoginNum();
+        return Result.success(result);
+    }
+
 
 }

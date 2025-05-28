@@ -30,4 +30,6 @@ public interface INotifyService extends IService<Notify> {
     boolean addNotify(SysNotifyDTO sysNotifyDTO);
 
     boolean addNotifyWithImage(String url, String title, String content);
+
+    Integer getNotifyNum();
 }

@@ -1,6 +1,5 @@
 package com.mingri.mapper;
 
-import com.mingri.dto.notify.SysNotifyDTO;
 import com.mingri.entity.Notify;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mingri.vo.SysGetNotifyVo;
@@ -53,4 +52,7 @@ public interface NotifyMapper extends BaseMapper<Notify> {
     @Select("SELECT id, title, content, image, status, create_time, update_time, create_by " +
             "FROM notify WHERE id = #{id}")
     SysGetNotifyVo getNotify(String id);
+
+    @Select("SELECT COUNT(*) FROM notify ")
+    Integer getNotifyNum();
 }

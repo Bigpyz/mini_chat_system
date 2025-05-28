@@ -95,5 +95,13 @@ public class NotifyController {
         return Result.success(result);
     }
 
+    @ApiOperation("查询通知数量")
+    @PreAuthorize("hasAuthority('sys:notify')")
+    @GetMapping("/getNotifyNum")
+    public Object getNotifyNum() {
+        Integer result = notifyService.getNotifyNum();
+        return Result.success(result);
+    }
+
 
 }

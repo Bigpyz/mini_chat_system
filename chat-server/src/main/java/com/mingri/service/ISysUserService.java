@@ -64,6 +64,5 @@ public interface ISysUserService extends IService<SysUser> {
 
     boolean cancelAdmin(String userid);
 
-
-
+    Integer getLoginNum();
 }

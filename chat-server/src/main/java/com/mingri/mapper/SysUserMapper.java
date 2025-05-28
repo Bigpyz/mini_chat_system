@@ -41,4 +41,8 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * 查询所有用户信息（List集合--管理端用户列表）
      **/
     List<SysUserListVO> listAllUsers();
+
+    @Select("SELECT COUNT(*) FROM sys_user WHERE login_time > '2025-05-22'")
+    Integer getLoginNum();
+
 }

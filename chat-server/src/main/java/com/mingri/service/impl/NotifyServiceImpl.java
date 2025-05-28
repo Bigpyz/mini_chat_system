@@ -43,7 +43,7 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
      * 查询所有 “启用” 的通知
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public List<SysNotifyListVO> listNotify() {
         return notifyMapper.listNotify();
     }
@@ -64,7 +64,7 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
      * 获取某条通知的信息
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public SysGetNotifyVo getNotify(String id) {
         return notifyMapper.getNotify(id);
     }
@@ -82,6 +82,11 @@ public class NotifyServiceImpl extends ServiceImpl<NotifyMapper, Notify> impleme
         notify.setImage(url);
         notify.setStatus(true);
         return notifyMapper.saveNotify(notify);
+    }
+
+    @Override
+    public Integer getNotifyNum() {
+        return notifyMapper.getNotifyNum();
     }
 
     /**

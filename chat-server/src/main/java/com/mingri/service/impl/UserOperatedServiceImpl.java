@@ -43,7 +43,7 @@ public class UserOperatedServiceImpl extends ServiceImpl<UserOperatedMapper, Use
      * 管理端主页用户活跃数据（登录的用户数量，在线用户数量，今日消息数量）
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public SysNumInfo numInfo() {
         SysNumInfo numInfo = new SysNumInfo();
         Integer loginNum =  sysUserMapper.loginNum();
@@ -70,7 +70,7 @@ public class UserOperatedServiceImpl extends ServiceImpl<UserOperatedMapper, Use
      * 查询今日发送消息数量前 10 的用户榜单
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public List<Top10MsgDto> getTop10Msg() {
         List<Top10MsgDto> result = messageMapper.getTop10Msg();
         return result;

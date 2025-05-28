@@ -233,7 +233,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 通过id获取用户信息
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public SysUserInfoVO getUserById(String userId) {
         return baseMapper.getUserById(userId);
     }
@@ -251,7 +251,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 查询所有用户信息
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public Map<String, SysUserInfoVO> listMapUser() {
         return baseMapper.listMapUser();
     }
@@ -400,7 +400,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 管理端查询所有用户信息
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public List<SysUserListVO> listUser() {
         // 获取所有用户
         List<SysUserListVO> userList = sysUserMapper.listAllUsers();
@@ -480,7 +480,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 管理端编辑用户信息时用于信息回显
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public SysUpdateUserDTO getUser(String userid) {
         SysUser sysUser = getById(userid);
         log.info("获取到该用户:{}", sysUser);
@@ -593,6 +593,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
+    @Override
+    public Integer getLoginNum() {
+        return sysUserMapper.getLoginNum();
+    }
 
 
 }

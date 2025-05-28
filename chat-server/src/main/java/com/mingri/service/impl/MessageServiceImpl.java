@@ -71,7 +71,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
      * 查询聊天记录
      **/
     @Override
-    @DS("slave")
+    //@DS("slave")
     public List<Message> record(RecordDTO recordDTO) {
         String userId = BaseContext.getCurrentId();
         List<Message> messages = messageMapper.record(userId, recordDTO.getTargetId(),
