@@ -55,4 +55,6 @@ public interface NotifyMapper extends BaseMapper<Notify> {
 
     @Select("SELECT COUNT(*) FROM notify ")
     Integer getNotifyNum();
+
+
 }

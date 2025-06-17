@@ -593,10 +593,5 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
-    @Override
-    public Integer getLoginNum() {
-        return sysUserMapper.getLoginNum();
-    }
-
 
 }

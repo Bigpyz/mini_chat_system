@@ -42,7 +42,4 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      **/
     List<SysUserListVO> listAllUsers();
 
-    @Select("SELECT COUNT(*) FROM sys_user WHERE login_time > '2025-05-22'")
-    Integer getLoginNum();
-
 }

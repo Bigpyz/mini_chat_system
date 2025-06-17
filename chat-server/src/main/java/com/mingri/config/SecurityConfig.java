@@ -55,7 +55,7 @@ public class SecurityConfig  {
 				.authorizeRequests()
 //				.anyRequest().permitAll(); //放行所有（测试）
 				.antMatchers("/api/v1/user/login","/api/v1/user/register","/api/v1/file",
-						"/api/v1/file","/api/v1/common",
+						"/api/v1/file","/api/v1/common/**",
 						"/ws/**",
 						"/v2/api-docs",
 						"/swagger-resources/configuration/ui",
